@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan Logger</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+      background-color: #f0f0f0;
+    }
+    input, button {
+      padding: 0.5rem;
+      font-size: 1rem;
+      margin-top: 1rem;
+    }
+    table {
+      width: 100%;
+      margin-top: 2rem;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 0.5rem;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>ระบบบันทึกการสแกน</h1>
+  <label for="scanInput">กรอกหรือสแกนข้อมูล:</label><br>
+  <input type="text" id="scanInput" placeholder="สแกนแล้ว Enter">
+  <button onclick="exportCSV()">Export CSV</button>
+
+  <table id="scanTable">
+    <thead>
+      <tr>
+        <th>ข้อมูลที่สแกน</th>
+        <th>วันเวลา</th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+
+  <script>
+    const input = document.getElementById("scanInput");
+    const table = document.getElementById("scanTable").getElementsByTagName("tbody")[0];
+    const records = [];
+
+    input.addEventListener("keypress", function(event) {
+      if (event.key === "Enter" && input.value.trim() !== "") {
+        const now = new Date().toLocaleString("th-TH");
+        const value = input.value.trim();
+        records.push({ value, time: now });
+
+        const row = table.insertRow();
+        row.insertCell(0).textContent = value;
+        row.insertCell(1).textContent = now;
+
+        input.value = "";
+      }
+    });
+
+    function exportCSV() {
+      let csv = "ข้อมูลที่สแกน,วันเวลา\n";
+      records.forEach(record => {
+        csv += `"${record.value}","${record.time}"\n`;
+      });
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "scan_log.csv";
+      link.click();
+    }
+  </script>
+</body>
+</html>
